@@ -1,0 +1,47 @@
+name: PR Merge
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  CI: true
+  IMAGE_NAME: rhiaqey/hub
+  CARGO_TERM_COLOR: always
+  CARGO_TAG_NAME: "GitHub Actions"
+  CARGO_TAG_EMAIL: "github-actions@github.com"
+
+permissions:
+  contents: write
+
+jobs:
+  Publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build
+        run: cargo build --verbose
+      - name: Run tests
+        run: cargo test --verbose
+
+      - name: Extract git branch
+        run: |
+          # Short name for current branch. For PRs, use target branch (base ref)
+          GIT_BRANCH=${GITHUB_BASE_REF:-${GITHUB_REF#refs/heads/}}
+          echo "GIT_BRANCH=$GIT_BRANCH" >> $GITHUB_ENV
+
+      - name: Commit and push
+        run: |
+          echo "Current branch $GIT_BRANCH"
+
+          git config user.name "$CARGO_TAG_NAME"
+          git config user.email "$CARGO_TAG_EMAIL"
+
+          cargo run patch -m "Release $GIT_TAG
+
+          [skip ci]
+          "
+
+          git push origin $GIT_BRANCH
+          git push origin $GIT_BRANCH --tags

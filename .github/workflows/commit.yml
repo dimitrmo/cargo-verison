@@ -2,11 +2,14 @@ name: Commit
 
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      - '!master'
   pull_request:
-    branches: [ "master" ]
+    branches:
+      - master
 
 env:
+  CI: true
   CARGO_TERM_COLOR: always
 
 jobs:
@@ -20,10 +23,3 @@ jobs:
       run: cargo build --verbose
     - name: Run tests
       run: cargo test --verbose
-    - name: Version bump
-      uses: dimitrmo/cargo-verison-action@183428eb8dd1ed6982b8f41da32fab7dfd031db8
-      with:
-        message: |
-          Release %s
-
-          [skip ci]
