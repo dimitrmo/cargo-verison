@@ -53,7 +53,11 @@ impl Project {
             .arg(&self.config.package.name)
             .arg("--offline")
             .output()
-            .map(|output| String::from_utf8_lossy(&output.stdout).into_owned())
+            .map(|output| {
+                let out = String::from_utf8_lossy(&output.stdout).into_owned();
+                println!(">> cmd.out: {out}");
+                out
+            })
             .map_err(|e| e.into())
     }
 
