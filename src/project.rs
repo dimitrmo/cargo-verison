@@ -48,13 +48,12 @@ impl Project {
     }
 
     pub fn cargo_update(&self) -> Result<String> {
-        let pkg_name = self.config.package.name.clone();
-        println!(">> running command: cargo update {pkg_name} --offline");
+        println!(">> running command: cargo generate-lockfile --verbose --locked");
 
         std::process::Command::new("cargo")
-            .arg("update")
-            .arg(&pkg_name)
-            .arg("--offline")
+            .arg("generate-lockfile")
+            .arg("--verbose")
+            .arg("--locked")
             .output()
             .map(|output| {
                 let out = String::from_utf8_lossy(&output.stdout).into_owned();
