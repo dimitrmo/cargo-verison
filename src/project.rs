@@ -48,9 +48,12 @@ impl Project {
     }
 
     pub fn cargo_update(&self) -> Result<String> {
+        let pkg_name = self.config.package.name.clone();
+        println!(">> running command: cargo update {pkg_name} --offline");
+
         std::process::Command::new("cargo")
             .arg("update")
-            .arg(&self.config.package.name)
+            .arg(&pkg_name)
             .arg("--offline")
             .output()
             .map(|output| {
