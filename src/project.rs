@@ -8,7 +8,7 @@ use std::path::Path;
 
 #[derive(Deserialize, Clone, Debug)]
 struct Package {
-    pub name: String,
+    // pub name: String,
     pub version: String,
 }
 
@@ -18,7 +18,7 @@ struct Config {
 }
 
 pub struct Project {
-    config: Config,
+    // config: Config,
     semver: semver::Version,
     repository: std::result::Result<git2::Repository, git2::Error>,
 }
@@ -32,7 +32,7 @@ impl Project {
         let config: Config = toml::from_str(&file)?;
         let version = semver::Version::parse(&config.package.version)?;
         Ok(Project{
-            config,
+            // config,
             semver: version,
             repository: repo,
         })
@@ -53,7 +53,7 @@ impl Project {
         std::process::Command::new("cargo")
             .arg("generate-lockfile")
             .arg("--verbose")
-            .arg("--locked")
+            // .arg("--locked")
             .output()
             .map(|output| {
                 let out = String::from_utf8_lossy(&output.stdout).into_owned();
