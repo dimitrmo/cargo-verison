@@ -21,3 +21,8 @@ toml_edit = "0.22.6"
 [[bin]]
 name = "cargo-verison"
 path = "src/cli.rs"
+
+[profile.release]
+opt-level = "z"
+strip = true
+lto = true
