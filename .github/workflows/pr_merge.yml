@@ -28,6 +28,11 @@ jobs:
       - name: Run tests
         run: cargo test --verbose
 
+      - name: Git setup
+        run: |
+          git config user.name "$CARGO_TAG_NAME"
+          git config user.email "$CARGO_TAG_EMAIL"
+
       - name: Cargo Verison
         run: |
           cargo run patch -m "Release %s
