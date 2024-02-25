@@ -42,22 +42,11 @@ pub fn main() -> Result<()> {
             add_git_tag
         } => {
             let patch = project.next_patch();
-            println!(">> new patch found {}", patch);
-
-            println!(">> writing manifest");
             project.write()?;
-
-            println!(">> updating packages");
             project.cargo_update()?;
-
             let add_git_tag = add_git_tag.unwrap_or(true);
-            println!(">> add git tag: {}", add_git_tag);
 
             if add_git_tag {
-                if let Some(commit) = message.clone() {
-                    println!(">> committing with message: {commit}");
-                }
-
                 project.commit(message)?;
             }
 

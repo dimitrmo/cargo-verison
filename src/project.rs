@@ -48,18 +48,12 @@ impl Project {
     }
 
     pub fn cargo_update(&self) -> Result<String> {
-        println!(">> running command: cargo generate-lockfile --verbose --locked");
-
         std::process::Command::new("cargo")
             .arg("generate-lockfile")
             .arg("--verbose")
             // .arg("--locked")
             .output()
-            .map(|output| {
-                let out = String::from_utf8_lossy(&output.stdout).into_owned();
-                println!(">> cmd.out: {out}");
-                out
-            })
+            .map(|output| String::from_utf8_lossy(&output.stdout).into_owned())
             .map_err(|e| e.into())
     }
 
