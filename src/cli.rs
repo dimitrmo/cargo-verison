@@ -6,6 +6,7 @@ use crate::error::Result;
 use clap::{Parser, Subcommand};
 
 #[derive(Parser, Debug)]
+#[clap(version)]
 #[command()]
 struct Args {
     #[command(subcommand)]
