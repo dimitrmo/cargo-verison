@@ -23,6 +23,8 @@ name = "cargo-verison"
 path = "src/cli.rs"
 
 [profile.release]
+codegen-units = 1
 opt-level = "z"
+panic = "abort"
 strip = true
 lto = true
