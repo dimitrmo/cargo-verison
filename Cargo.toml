@@ -16,7 +16,7 @@ git2 = "0.18.3"
 semver = "1.0.22"
 serde = { version = "1.0.197", features = ["derive"] }
 toml = { version = "0.8.11", features = ["parse"] }
-toml_edit = "0.22.8"
+toml_edit = "0.22.9"
 
 [[bin]]
 name = "cargo-verison"
