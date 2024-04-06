@@ -20,7 +20,7 @@ enum Commands {
         /// If supplied with -m or --message config option, cargo will use it as a commit message when creating a version commit.
         /// If the message config contains %s then that will be replaced with the resulting version number. For example:
         ///
-        /// cargo verison patch -m "Upgrade to %s for reasons"
+        /// Cargo verison patch -m "Upgrade to %s for reasons"
         ///
         #[clap(short, long)]
         message: Option<String>,

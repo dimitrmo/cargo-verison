@@ -20,7 +20,7 @@ struct Config {
 pub struct Project {
     // config: Config,
     semver: semver::Version,
-    repository: std::result::Result<git2::Repository, git2::Error>,
+    repository: std::result::Result<Repository, git2::Error>,
 }
 
 impl Project {
@@ -61,7 +61,7 @@ impl Project {
         let mut path = current_dir()?;
         path.push("Cargo.toml");
         let file = read_to_string(&path)?;
-        let mut document = file.parse::<toml_edit::Document>()?;
+        let mut document = file.parse::<toml_edit::DocumentMut>()?;
         document["package"]["version"] = toml_edit::value(self.get_current_version());
         let mut file = OpenOptions::new().write(true).truncate(true).open(&path)?;
         file.write_all(document.to_string().as_bytes())?;
