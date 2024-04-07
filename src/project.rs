@@ -201,6 +201,7 @@ mod tests {
     #[test]
     fn it_can_read_version_from_a_path() {
         let project = Project::create(false, Some(String::from("tests/standalone")));
+        assert!(project.is_ok());
         assert_eq!(project.unwrap().semver.to_string(), "1.2.3");
     }
 
