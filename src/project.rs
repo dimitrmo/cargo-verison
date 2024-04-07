@@ -1,5 +1,4 @@
-use crate::error::{Result, VerisonError};
-use git2::Repository;
+use git2::{Commit, Repository};
 use serde::Deserialize;
 use std::env::current_dir;
 use std::fs::{read_to_string, OpenOptions};
@@ -30,12 +29,12 @@ struct WorkspaceConfig {
 pub struct Project {
     workspace: bool,
     semver: semver::Version,
-    repository: std::result::Result<Repository, git2::Error>,
+    repository: Result<Repository, git2::Error>,
     directory: Option<String>,
 }
 
 impl Project {
-    pub fn create(workspace: bool, directory: Option<String>) -> Result<Self> {
+    pub fn create(workspace: bool, directory: Option<String>) -> anyhow::Result<Self> {
         let mut path = match directory.as_ref() {
             None => current_dir()?,
             Some(dir) => PathBuf::from(dir),
@@ -64,12 +63,12 @@ impl Project {
         })
     }
 
-    pub fn set_version(&mut self, version: &str) -> Result<()> {
+    pub fn set_version(&mut self, version: &str) -> anyhow::Result<()> {
         self.semver = semver::Version::parse(version)?;
         Ok(())
     }
 
-    pub fn next_patch(&mut self) -> Result<String> {
+    pub fn next_patch(&mut self) -> anyhow::Result<String> {
         let mut next = self.semver.clone();
         next.patch += 1;
         self.set_version(next.to_string().as_str())?;
@@ -80,7 +79,7 @@ impl Project {
         return self.semver.to_string();
     }
 
-    pub fn cargo_update(&self) -> Result<String> {
+    pub fn cargo_update(&self) -> anyhow::Result<String> {
         std::process::Command::new("cargo")
             .arg("generate-lockfile")
             .arg("--verbose")
@@ -100,7 +99,7 @@ impl Project {
         }
     }
 
-    pub fn write(&self) -> Result<()> {
+    pub fn write(&self) -> anyhow::Result<()> {
         let mut path = match self.directory.as_ref() {
             None => current_dir()?,
             Some(dir) => PathBuf::from(dir),
@@ -117,13 +116,15 @@ impl Project {
     }
 
     #[inline(always)]
-    fn find_last_commit(repo: &Repository) -> std::result::Result<git2::Commit, git2::Error> {
+    fn find_last_commit(repo: &Repository) -> anyhow::Result<Commit> {
         let obj = repo.head()?.resolve()?.peel(git2::ObjectType::Commit)?;
-        obj.into_commit()
-            .map_err(|_| git2::Error::from_str("Couldn't find commit"))
+        let commit = obj
+            .into_commit()
+            .map_err(|_| git2::Error::from_str("Couldn't find commit"))?;
+        Ok(commit)
     }
 
-    pub fn commit(&self, message: Option<String>) -> Result<()> {
+    pub fn commit(&self, message: Option<String>) -> anyhow::Result<()> {
         let version = self.get_current_version();
         let commit = match message {
             Some(msg) => msg.replace("%s", &version),
@@ -133,11 +134,12 @@ impl Project {
         let repo = match self.repository.as_ref() {
             Ok(repo) => repo,
             Err(git_error) => {
-                return Err(VerisonError::Git(git2::Error::new(
+                return Err(git2::Error::new(
                     git_error.code(),
                     git_error.class(),
                     git_error.message(),
-                )));
+                )
+                .into());
             }
         };
 

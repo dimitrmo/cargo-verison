@@ -1,7 +1,5 @@
-mod error;
 mod project;
 
-use crate::error::Result;
 use clap::{Parser, Subcommand};
 use project::Project;
 
@@ -47,7 +45,7 @@ enum Commands {
     },
 }
 
-pub fn main() -> Result<()> {
+pub fn main() -> anyhow::Result<()> {
     let args = Args::parse();
 
     match args.cmd {
@@ -68,6 +66,7 @@ pub fn main() -> Result<()> {
         } => {
             let workspace = workspace.unwrap_or(false);
             let mut project = Project::create(workspace, directory)?;
+
             let new_version = project.next_patch()?;
             project.write()?;
             project.cargo_update()?;
