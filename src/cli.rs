@@ -19,6 +19,10 @@ enum Commands {
         /// Update the workspace version
         #[clap(long = "workspace")]
         workspace: Option<bool>,
+
+        /// Project directory. Defaults to current_dir.
+        #[clap(long = "directory")]
+        directory: Option<String>,
     },
     Patch {
         /// If supplied with -m or --message config option, cargo will use it as a commit message when creating a version commit.
@@ -36,6 +40,10 @@ enum Commands {
         /// Update the workspace version
         #[clap(long = "workspace")]
         workspace: Option<bool>,
+
+        /// Project directory. Defaults to current_dir.
+        #[clap(long = "directory")]
+        directory: Option<String>,
     },
 }
 
@@ -43,9 +51,12 @@ pub fn main() -> Result<()> {
     let args = Args::parse();
 
     match args.cmd {
-        Commands::Current { workspace } => {
+        Commands::Current {
+            workspace,
+            directory,
+        } => {
             let workspace = workspace.unwrap_or(false);
-            let project = Project::create(workspace, None)?;
+            let project = Project::create(workspace, directory)?;
 
             println!("{}", project.get_current_version())
         }
@@ -53,9 +64,10 @@ pub fn main() -> Result<()> {
             message,
             add_git_tag,
             workspace,
+            directory,
         } => {
             let workspace = workspace.unwrap_or(false);
-            let mut project = Project::create(workspace, None)?;
+            let mut project = Project::create(workspace, directory)?;
             let patch = project.next_patch();
             project.write()?;
             project.cargo_update()?;
