@@ -7,4 +7,5 @@ prod:
 
 .PHONY: test
 test:
-	cargo test
+	cargo test -- --test-threads 1
+	cargo test --release -- --test-threads 1

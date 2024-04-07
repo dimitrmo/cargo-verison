@@ -1,21 +1,27 @@
-mod error;
 mod project;
 
-use project::Project;
-use crate::error::Result;
 use clap::{Parser, Subcommand};
+use project::Project;
 
 #[derive(Parser, Debug)]
 #[clap(version)]
 #[command()]
 struct Args {
     #[command(subcommand)]
-    cmd: Commands
+    cmd: Commands,
 }
 
 #[derive(Subcommand, Debug, Clone)]
 enum Commands {
-    Current,
+    Current {
+        /// Update the workspace version
+        #[clap(long = "workspace")]
+        workspace: Option<bool>,
+
+        /// Project directory. Defaults to current_dir.
+        #[clap(long = "directory")]
+        directory: Option<String>,
+    },
     Patch {
         /// If supplied with -m or --message config option, cargo will use it as a commit message when creating a version commit.
         /// If the message config contains %s then that will be replaced with the resulting version number. For example:
@@ -28,21 +34,40 @@ enum Commands {
         /// Tag the commit when using the cargo verison command. Setting this to false results in no commit being made at all.
         #[clap(long = "git-tag-version")]
         add_git_tag: Option<bool>,
-    }
+
+        /// Update the workspace version
+        #[clap(long = "workspace")]
+        workspace: Option<bool>,
+
+        /// Project directory. Defaults to current_dir.
+        #[clap(long = "directory")]
+        directory: Option<String>,
+    },
 }
 
-pub fn main() -> Result<()> {
+pub fn main() -> anyhow::Result<()> {
     let args = Args::parse();
-    let mut project = Project::new()?;
+
     match args.cmd {
-        Commands::Current => {
+        Commands::Current {
+            workspace,
+            directory,
+        } => {
+            let workspace = workspace.unwrap_or(false);
+            let project = Project::create(workspace, directory)?;
+
             println!("{}", project.get_current_version())
         }
-        Commands::Patch{
+        Commands::Patch {
             message,
-            add_git_tag
+            add_git_tag,
+            workspace,
+            directory,
         } => {
-            let patch = project.next_patch();
+            let workspace = workspace.unwrap_or(false);
+            let mut project = Project::create(workspace, directory)?;
+
+            let new_version = project.next_patch()?;
             project.write()?;
             project.cargo_update()?;
             let add_git_tag = add_git_tag.unwrap_or(true);
@@ -51,7 +76,7 @@ pub fn main() -> Result<()> {
                 project.commit(message)?;
             }
 
-            println!("{}", patch);
+            println!("{}", new_version);
         }
     };
     Ok(())

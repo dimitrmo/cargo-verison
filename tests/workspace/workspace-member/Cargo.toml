@@ -1,0 +1,4 @@
+[package]
+name = "workspace-member"
+version.workspace = true
+edition.workspace = true
