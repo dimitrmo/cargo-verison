@@ -31,11 +31,12 @@ pub struct Project {
     workspace: bool,
     semver: semver::Version,
     repository: std::result::Result<Repository, git2::Error>,
+    directory: Option<String>,
 }
 
 impl Project {
     pub fn create(workspace: bool, directory: Option<String>) -> Result<Self> {
-        let mut path = match directory {
+        let mut path = match directory.as_ref() {
             None => current_dir()?,
             Some(dir) => PathBuf::from(dir),
         };
@@ -59,7 +60,13 @@ impl Project {
             workspace,
             semver,
             repository,
+            directory,
         })
+    }
+
+    pub fn set_version(&mut self, version: &str) -> Result<()> {
+        self.semver = semver::Version::parse(version)?;
+        Ok(())
     }
 
     pub fn next_patch(&mut self) -> String {
@@ -92,13 +99,18 @@ impl Project {
     }
 
     pub fn write(&self) -> Result<()> {
-        let mut path = current_dir()?;
+        let mut path = match self.directory.as_ref() {
+            None => current_dir()?,
+            Some(dir) => PathBuf::from(dir),
+        };
+
         path.push("Cargo.toml");
         let file = read_to_string(&path)?;
         let mut document = file.parse::<DocumentMut>()?;
         self.update_version(&mut document);
         let mut file = OpenOptions::new().write(true).truncate(true).open(&path)?;
         file.write_all(document.to_string().as_bytes())?;
+
         Ok(())
     }
 
@@ -232,5 +244,35 @@ mod tests {
         assert_eq!(project.as_ref().unwrap().get_current_version(), "3.2.1");
         assert_eq!(project.as_mut().unwrap().next_patch(), "3.2.2");
         assert_eq!(project.as_ref().unwrap().get_current_version(), "3.2.2");
+    }
+
+    #[test]
+    fn it_can_read_and_calculate_and_write_a_project() {
+        let mut project = Project::create(false, Some(String::from("tests/standalone")));
+        assert!(project.is_ok());
+        assert_eq!(project.as_ref().unwrap().semver.to_string(), "1.2.3");
+        assert_eq!(project.as_ref().unwrap().get_current_version(), "1.2.3");
+        assert_eq!(project.as_mut().unwrap().next_patch(), "1.2.4");
+        assert_eq!(project.as_ref().unwrap().get_current_version(), "1.2.4");
+        project.as_mut().unwrap().write().unwrap();
+        let mut project2 = Project::create(false, Some(String::from("tests/standalone")));
+        assert_eq!(project2.as_ref().unwrap().get_current_version(), "1.2.4");
+        project2.as_mut().unwrap().set_version("1.2.3").unwrap();
+        project2.as_mut().unwrap().write().unwrap();
+    }
+
+    #[test]
+    fn it_can_read_and_calculate_and_write_a_workspace_project() {
+        let mut project = Project::create(true, Some(String::from("tests/workspace")));
+        assert!(project.is_ok());
+        assert_eq!(project.as_ref().unwrap().semver.to_string(), "3.2.1");
+        assert_eq!(project.as_ref().unwrap().get_current_version(), "3.2.1");
+        assert_eq!(project.as_mut().unwrap().next_patch(), "3.2.2");
+        assert_eq!(project.as_ref().unwrap().get_current_version(), "3.2.2");
+        project.as_mut().unwrap().write().unwrap();
+        let mut project2 = Project::create(true, Some(String::from("tests/workspace")));
+        assert_eq!(project2.as_ref().unwrap().get_current_version(), "3.2.2");
+        project2.as_mut().unwrap().set_version("3.2.1").unwrap();
+        project2.as_mut().unwrap().write().unwrap();
     }
 }
