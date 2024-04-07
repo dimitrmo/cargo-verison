@@ -1,0 +1,11 @@
+[package]
+name = "workspace"
+version.workspace = true
+edition.workspace = true
+
+[workspace]
+members = ["workspace-member"]
+
+[workspace.package]
+version = "3.2.1"
+edition = "2021"
