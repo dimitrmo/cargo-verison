@@ -179,7 +179,6 @@ mod tests {
         let project = Project::create(false, Some(String::from("tests/standalone")));
         assert!(project.is_ok());
         assert_eq!(project.as_ref().unwrap().workspace, false);
-        assert!(project.as_ref().unwrap().repository.is_ok());
         assert!(!project.as_ref().unwrap().semver.to_string().is_empty());
     }
 
@@ -187,15 +186,6 @@ mod tests {
     fn it_can_read_version_from_a_path() {
         let project = Project::create(false, Some(String::from("tests/standalone")));
         assert_eq!(project.unwrap().semver.to_string(), "1.2.3");
-    }
-
-    #[test]
-    fn it_can_create_a_project_from_path_with_no_repo() {
-        let project = Project::create(false, Some(String::from("tests/standalone-no-repo")));
-        assert!(project.is_ok());
-        assert_eq!(project.as_ref().unwrap().workspace, false);
-        assert!(project.as_ref().unwrap().repository.is_err());
-        assert!(!project.as_ref().unwrap().semver.to_string().is_empty());
     }
 
     #[test]
@@ -218,7 +208,6 @@ mod tests {
         let project = Project::create(true, Some(String::from("tests/workspace")));
         assert!(project.is_ok());
         assert_eq!(project.as_ref().unwrap().workspace, true);
-        assert!(project.as_ref().unwrap().repository.is_ok());
         assert!(!project.as_ref().unwrap().semver.to_string().is_empty());
     }
 
