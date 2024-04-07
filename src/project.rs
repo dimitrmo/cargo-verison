@@ -263,6 +263,7 @@ mod tests {
         assert_eq!(project2.as_ref().unwrap().get_current_version(), "1.2.4");
         project2.as_mut().unwrap().set_version("1.2.3").unwrap();
         project2.as_mut().unwrap().write().unwrap();
+        assert_eq!(project2.as_ref().unwrap().get_current_version(), "1.2.3");
     }
 
     #[test]
@@ -278,5 +279,6 @@ mod tests {
         assert_eq!(project2.as_ref().unwrap().get_current_version(), "3.2.2");
         project2.as_mut().unwrap().set_version("3.2.1").unwrap();
         project2.as_mut().unwrap().write().unwrap();
+        assert_eq!(project2.as_ref().unwrap().get_current_version(), "3.2.1");
     }
 }

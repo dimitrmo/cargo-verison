@@ -12,6 +12,9 @@ env:
   CI: true
   CARGO_TERM_COLOR: always
 
+permissions:
+  contents: write
+
 jobs:
   Build:
 
