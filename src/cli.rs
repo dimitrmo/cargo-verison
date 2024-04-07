@@ -68,7 +68,7 @@ pub fn main() -> Result<()> {
         } => {
             let workspace = workspace.unwrap_or(false);
             let mut project = Project::create(workspace, directory)?;
-            let patch = project.next_patch();
+            let new_version = project.next_patch()?;
             project.write()?;
             project.cargo_update()?;
             let add_git_tag = add_git_tag.unwrap_or(true);
@@ -77,7 +77,7 @@ pub fn main() -> Result<()> {
                 project.commit(message)?;
             }
 
-            println!("{}", patch);
+            println!("{}", new_version);
         }
     };
     Ok(())

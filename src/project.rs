@@ -69,9 +69,11 @@ impl Project {
         Ok(())
     }
 
-    pub fn next_patch(&mut self) -> String {
-        self.semver.patch += 1;
-        return self.get_current_version();
+    pub fn next_patch(&mut self) -> Result<String> {
+        let mut next = self.semver.clone();
+        next.patch += 1;
+        self.set_version(next.to_string().as_str())?;
+        return Ok(self.get_current_version());
     }
 
     pub fn get_current_version(&self) -> String {
@@ -242,7 +244,7 @@ mod tests {
         assert!(project.is_ok());
         assert_eq!(project.as_ref().unwrap().semver.to_string(), "3.2.1");
         assert_eq!(project.as_ref().unwrap().get_current_version(), "3.2.1");
-        assert_eq!(project.as_mut().unwrap().next_patch(), "3.2.2");
+        assert_eq!(project.as_mut().unwrap().next_patch().unwrap(), "3.2.2");
         assert_eq!(project.as_ref().unwrap().get_current_version(), "3.2.2");
     }
 
@@ -252,7 +254,7 @@ mod tests {
         assert!(project.is_ok());
         assert_eq!(project.as_ref().unwrap().semver.to_string(), "1.2.3");
         assert_eq!(project.as_ref().unwrap().get_current_version(), "1.2.3");
-        assert_eq!(project.as_mut().unwrap().next_patch(), "1.2.4");
+        assert_eq!(project.as_mut().unwrap().next_patch().unwrap(), "1.2.4");
         assert_eq!(project.as_ref().unwrap().get_current_version(), "1.2.4");
         project.as_mut().unwrap().write().unwrap();
         let mut project2 = Project::create(false, Some(String::from("tests/standalone")));
@@ -267,7 +269,7 @@ mod tests {
         assert!(project.is_ok());
         assert_eq!(project.as_ref().unwrap().semver.to_string(), "3.2.1");
         assert_eq!(project.as_ref().unwrap().get_current_version(), "3.2.1");
-        assert_eq!(project.as_mut().unwrap().next_patch(), "3.2.2");
+        assert_eq!(project.as_mut().unwrap().next_patch().unwrap(), "3.2.2");
         assert_eq!(project.as_ref().unwrap().get_current_version(), "3.2.2");
         project.as_mut().unwrap().write().unwrap();
         let mut project2 = Project::create(true, Some(String::from("tests/workspace")));
