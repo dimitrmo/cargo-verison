@@ -16,7 +16,7 @@ clap = { version = "4.5.4", features = ["derive"] }
 git2 = { version = "0.18.3" }
 semver = { version = "1.0.22" }
 serde = { version = "1.0.202", features = ["derive"] }
-toml = { version = "0.8.11", features = ["parse"] }
+toml = { version = "0.8.13", features = ["parse"] }
 toml_edit = { version = "0.22.12" }
 
 [[bin]]
