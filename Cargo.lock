@@ -66,7 +66,7 @@ checksum = "34efbcccd345379ca2868b2b2c9d3782e9cc58ba87bc7d79d5b53d9c9ae6f25d"
 
 [[package]]
 name = "cargo-verison"
-version = "0.1.126"
+version = "0.1.127"
 dependencies = [
  "anyhow",
  "clap",
