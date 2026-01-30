@@ -1,6 +1,6 @@
 [package]
 name = "cargo-verison"
-version = "0.1.148"
+version = "0.1.149"
 edition = "2024"
 description = "Bump a package version"
 readme = "README.md"
