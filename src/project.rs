@@ -72,11 +72,11 @@ impl Project {
         let mut next = self.semver.clone();
         next.patch += 1;
         self.set_version(next.to_string().as_str())?;
-        return Ok(self.get_current_version());
+        Ok(self.get_current_version())
     }
 
     pub fn get_current_version(&self) -> String {
-        return self.semver.to_string();
+        self.semver.to_string()
     }
 
     pub fn cargo_update(&self) -> anyhow::Result<String> {
@@ -116,7 +116,7 @@ impl Project {
     }
 
     #[inline(always)]
-    fn find_last_commit(repo: &Repository) -> anyhow::Result<Commit> {
+    fn find_last_commit(repo: &Repository) -> anyhow::Result<Commit<'_>> {
         let obj = repo.head()?.resolve()?.peel(git2::ObjectType::Commit)?;
         let commit = obj
             .into_commit()

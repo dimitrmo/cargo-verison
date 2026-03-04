@@ -1,9 +1,12 @@
 .PHONY: prod
 prod:
-	cargo build --bin cargo-verison
-	ls -lah target/debug/cargo-verison
-	cargo build --release --bin cargo-verison
+	cargo build --release --bin cargo-verison --all-features
 	ls -lah target/release/cargo-verison
+
+.PHONY: dev
+dev:
+	cargo build --bin cargo-verison --all-features
+	ls -lah target/debug/cargo-verison
 
 .PHONY: test
 test:
